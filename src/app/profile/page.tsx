@@ -5,39 +5,46 @@ import { UserType } from '@/types/UserType'
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useDispatch, useSelector } from 'react-redux'
+import { viewProfile } from '@/redux/slices/userSlice'
+import { AppDispatch, RootState } from '@/redux/store'
 
 const ViewProfile = () => {
-  const [profile, setProfile] = useState<UserType | null>(null)
+  // const [profile, setProfile] = useState<UserType | null>(null)
+  const dispatch = useDispatch<AppDispatch>()
+  const { user, loading } = useSelector((state: RootState) => state.user)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
 
     if (token) {
-      api
-        .get('/user/viewprofile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          setProfile(res.data.data)
-        })
-        .catch((err) => {
-          alert('No user found')
-          console.error('No user found:', err)
-        })
+      dispatch(viewProfile(token)) 
+
+      // api
+      //   .get('/user/viewprofile', {
+      //     headers: {
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   })
+        // .then((res) => {
+        //   setProfile(res.data.data)
+        // })
+        // .catch((err) => {
+        //   alert('No user found')
+        //   console.error('No user found:', err)
+        // })
     }
-  }, [])
+  }, [dispatch])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-800 px-4">
-      {profile ? (
+      {user ? (
         <div className="max-w-md w-full bg-white/10 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-8 text-white relative overflow-hidden transition-transform hover:scale-[1.01]">
         
           <div className="flex justify-center mb-6">
             <div className="relative w-32 h-32 rounded-full border-4 border-white shadow-md overflow-hidden">
               <Image
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${profile.image}`}
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.image}`}
                 alt="Profile"
                 fill
                 className="object-cover rounded-full"
@@ -48,10 +55,10 @@ const ViewProfile = () => {
 
         
           <div className="text-center">
-            <h2 className="text-2xl font-bold tracking-wide">{profile.username}</h2>
-            <p className="text-gray-300 mt-1">{profile.email}</p>
+            <h2 className="text-2xl font-bold tracking-wide">{user.username}</h2>
+            <p className="text-gray-300 mt-1">{user.email}</p>
             <span className="inline-block mt-3 px-4 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-sm font-medium">
-              {profile.role ?? 'N/A'}
+              {user.role ?? 'N/A'}
             </span>
           </div>
 

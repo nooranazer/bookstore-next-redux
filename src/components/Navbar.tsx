@@ -77,7 +77,7 @@ const Navbar = () => {
                     <Image
                       src={
                         user.image
-                          ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.image}`
+                          ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/${user.image}?t=${Date.now()}`
                           : '/avatar.png'
                       }
                       alt="avatar"

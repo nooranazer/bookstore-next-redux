@@ -8,6 +8,9 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useUser } from '@/app/context/userContext'
 import Image from 'next/image'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@/redux/store'
+import { editProfile, viewProfile } from '@/redux/slices/userSlice'
 
 
 const schema = yup.object({
@@ -18,15 +21,10 @@ const schema = yup.object({
 
 const EditProfile = () => {
   const {user, setUser} = useUser()
+  const dispatch = useDispatch<AppDispatch>()
+
 
   const router = useRouter()
-  // const [profile, setProfile] = useState<UserType>({
-  //   username: '',
-  //   email: '',
-  //   password: '',
-  //   image: '' 
-  // })
-
   const {
   register,
   handleSubmit,
@@ -41,25 +39,23 @@ const EditProfile = () => {
   const [preview, setPreview] = useState<string>('')
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    api
-      .get('/user/viewprofile', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res.data.data,'datassss')
-        setValue('username', res.data.data.username)
-        setValue('email', res.data.data.email)
-        // setProfile(res.data.data)
-        setPreview(`${process.env.NEXT_PUBLIC_BACKEND_URL}/${res.data.data.image}`)
-      })
-      .catch((err) => {
-        alert('No user found')
-        console.error('No user found:', err)
-      })
-  }, [setValue])
+  const token = localStorage.getItem('token')
+  if (!token) return
+
+  dispatch(viewProfile(token))
+    .unwrap()
+    .then((data) => {
+      console.log(data, 'profile data')
+      setValue('username', data.username)
+      setValue('email', data.email)
+      setPreview(`${process.env.NEXT_PUBLIC_BACKEND_URL}/${data.image}`)
+    })
+    .catch((err) => {
+      alert('No user found')
+      console.error('Profile fetch failed:', err)
+    })
+}, [dispatch, setValue])
+
 
   // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   const { name, value } = e.target
@@ -74,35 +70,33 @@ const EditProfile = () => {
     }
   }
 
-  const handleUpdateButton = async (data: UserType) => {
-    // e.preventDefault()
+  const handleUpdateButton = (data: UserType) => {
+  const token = localStorage.getItem('token')
+  if (!token) return
 
-    const token = localStorage.getItem('token')
-    const formData = new FormData()
-    formData.append('username', data.username)
-    formData.append('email', data.email)
-    if (imageFile) {
-      formData.append('image', imageFile)
-    }
-
-    await api
-      .patch('/user/editprofile', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then((res) => {
-        setUser(res.data.data)
-        // localStorage.setItem('user', JSON.stringify(res.data.data))
-        alert('Profile updated!')
-        router.push('/profile')
-      })
-      .catch((err) => {
-        alert('Cannot update profile')
-        console.error('Update failed:', err)
-      })
+  const formData = new FormData()
+  formData.append('username', data.username)
+  formData.append('email', data.email)
+  if (imageFile) {
+    formData.append('image', imageFile)
   }
+
+  dispatch(editProfile({ formData, token }))
+    .unwrap()
+    .then((res) => {
+      setUser(res) 
+      alert('Profile updated!')
+      setTimeout(() => {
+      router.push('/profile')
+    }, 200)
+      
+    })
+    .catch((err) => {
+      alert('Cannot update profile')
+      console.error('Update failed:', err)
+    })
+}
+
 
   return (
     <div className="max-w-2xl mx-auto mt-10 bg-white shadow-xl rounded-xl p-8">
