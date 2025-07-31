@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@/lib/api'
 import BookType, { AddBookType } from '@/types/BookType';
+import toast from 'react-hot-toast';
 
 
 interface BookState {
@@ -165,7 +166,7 @@ const bookSlice = createSlice({
         state.loading = false;
         const updatedBook = action.payload
         state.books = state.books.map((book) => (
-          book._id === updatedBook.id ? updatedBook : book
+        book._id === updatedBook.id ? updatedBook : book
         ))
 
       })

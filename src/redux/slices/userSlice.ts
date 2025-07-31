@@ -1,6 +1,7 @@
 import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
 import api from "@/lib/api";
 import { UserType } from "@/types/UserType";
+import toast from "react-hot-toast";
 
 interface UserState {
   user: UserType | null;
@@ -56,17 +57,17 @@ const userSlice =  createSlice({
 
         //viewprofile
         .addCase(viewProfile.pending, (state) => {
-            state.loading = true;
-            state.error = null
+          state.loading = true;
+          state.error = null
         })
 
          .addCase(viewProfile.fulfilled, (state, action) => {
-                state.loading = false;
-                state.user = action.payload;
+            state.loading = false;
+            state.user = action.payload;
               })
         .addCase(viewProfile.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message || 'Failed to fetch profile';
+            state.loading = false;
+            state.error = action.error.message || 'Failed to fetch profile';
          })
 
         .addCase(editProfile.pending, (state) => {
@@ -76,10 +77,12 @@ const userSlice =  createSlice({
         .addCase(editProfile.fulfilled, (state, action) => {
           state.loading = false
           state.user = action.payload 
+          toast.success('Profile updated successfully!!!!');
         })
         .addCase(editProfile.rejected, (state, action) => {
           state.loading = false
           state.error = action.error.message || 'Failed to update profile'
+          toast.error('failed to update');
         })
 
         

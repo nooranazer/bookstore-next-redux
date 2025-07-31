@@ -139,7 +139,7 @@ const BookList = () => {
     } else {
       console.warn('No token found — cannot fetch books.')
     }
-  }, [currentPage])
+  }, [currentPage, dispatch])
 
   if (!books) {
     return <p>Loading book details...</p>

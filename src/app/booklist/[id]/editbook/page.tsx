@@ -13,6 +13,7 @@ import Image from 'next/image'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/redux/store'
 import { editBook, getBook } from '@/redux/slices/bookSlice'
+import toast from 'react-hot-toast'
 
 
 const schema = yup.object().shape({
@@ -68,7 +69,7 @@ const EditBook = () => {
     //   .get(`/books/view/${id}`, {
     //     headers: { Authorization: `Bearer ${token}` },
     //   })
-  }, [id, setValue])
+  }, [id, setValue, dispatch])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -98,11 +99,11 @@ const EditBook = () => {
     dispatch(editBook({ token, formData, id: id as string }))
       .unwrap()//  returns the actual result or throws error
       .then(() => {
-        alert('Book updated successfully!');
+        toast.success('Book updated successfully!');
         router.push(`/booklist/${id}`);
       })
       .catch((err) => {
-        alert('failed to update')
+        toast.error('Failed to update book.');
         console.error('Update failed:', err);
       });
     // api

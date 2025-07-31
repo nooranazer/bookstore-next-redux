@@ -11,6 +11,7 @@ import Image from 'next/image'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/redux/store'
 import { editProfile, viewProfile } from '@/redux/slices/userSlice'
+import toast from 'react-hot-toast'
 
 
 const schema = yup.object({
@@ -71,31 +72,31 @@ const EditProfile = () => {
   }
 
   const handleUpdateButton = (data: UserType) => {
-  const token = localStorage.getItem('token')
-  if (!token) return
+  const token = localStorage.getItem('token');
+  if (!token) return;
 
-  const formData = new FormData()
-  formData.append('username', data.username)
-  formData.append('email', data.email)
+  const formData = new FormData();
+  formData.append('username', data.username);
+  formData.append('email', data.email);
   if (imageFile) {
-    formData.append('image', imageFile)
+    formData.append('image', imageFile);
   }
+
+  const toastId = toast.loading('Updating profile...');
 
   dispatch(editProfile({ formData, token }))
     .unwrap()
     .then((res) => {
-      setUser(res) 
-      alert('Profile updated!')
-      setTimeout(() => {
-      router.push('/profile')
-    }, 200)
-      
+      toast.dismiss(toastId); 
+      setUser(res);
+      router.push('/profile');
     })
     .catch((err) => {
-      alert('Cannot update profile')
-      console.error('Update failed:', err)
-    })
-}
+      toast.dismiss(toastId); 
+      console.error('Update failed:', err);
+    });
+};
+
 
 
   return (

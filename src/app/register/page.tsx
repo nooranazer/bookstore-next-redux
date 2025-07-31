@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useUser } from '../context/userContext';
+import toast from 'react-hot-toast';
 
 //yup schema
 const schema = yup.object({
@@ -78,11 +79,12 @@ const RegisterPage = () => {
       return res.json();
     })
     .then(() => {
+      toast.success('welcome to Bookhive!')
       router.push('/booklist');
     })
     .catch((err) => {
       console.error('Registration error:', err);
-      alert(err?.response?.data?.message || err.message || 'Registration failed');
+      toast.error('Invalid credentials')
     });
 };
 

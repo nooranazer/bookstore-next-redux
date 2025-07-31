@@ -7,6 +7,7 @@
   import * as yup from 'yup';
   import { useForm } from 'react-hook-form';
   import { yupResolver } from '@hookform/resolvers/yup';
+import toast from 'react-hot-toast';
 
   //  validation schema
   const schema = yup.object({
@@ -105,13 +106,13 @@ const onSubmit = (data: LoginFormData) => {
           console.warn('Failed to set cookies');
         }
 
-        alert('Login successful'); 
+        toast.success('welcome Back!')
         router.push('/booklist');
       });
     })
     .catch((err) => {
       console.error('Login failed:', err);
-      alert('Invalid credentials'); 
+      toast.error('invalid credentials')
     });
 };
 
